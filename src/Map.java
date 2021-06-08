@@ -27,7 +27,8 @@ public class Map {
 		snake.add(new Point(3, 5));
 		snake.add(new Point(3, 6));
 		// 產生水果
-		//generateFruit();
+		// generateFruit();
+		this.grid[2][2] = 2;
 	}
 
 	public void clearSnake() {
@@ -47,46 +48,53 @@ public class Map {
 		}
 	}
 
-//	public void moveSnakeNew(int gridvalue) {
-//		Point tail = snake.get(snake.size() - 1);
-//		int x = tail.getX();
-//		int y = tail.getY();
-//		moveSnake();
-//
-//		if (gridvalue == 2) {
-//			snake.add(new Point(x, y));
-//		}
-//	}
+	public void addSnakeToMap() {
+		// 將蛇的身體設為1
+		for (int i = 0; i < snake.size(); i++) {
+			Point p = snake.get(i);
+			grid[p.getY()][p.getX()] = 1;
+		}
+	}
 
-//	private void generateFruit() {
-//		int minX = 1;
-//		int maxX = M - 2;
-//		int minY = 1;
-//		int maxY = N - 2;
-//		int i;
-//		do {
-//			// Generate random int value from 1 to M-2
-//			int randomX = (int) Math.floor(Math.random() * (maxX - minX + 1) + minX);
-//
-//			// Generate random int value from 1 to N-2
-//			int randomY = (int) Math.floor(Math.random() * (maxY - minY + 1) + minY);
-//			i = grid[randomY][randomX];
-//			grid[randomY][randomX] = 2;
-//			break;
-//		} while (i != 1 && i != 2);
-//	}
+	private void generateFruit() {
+		int minX = 1;
+		int maxX = M - 2;
+		int minY = 1;
+		int maxY = N - 2;
+		int i;
+		do {
+			// Generate random int value from 1 to M-2
+			int randomX = (int) Math.floor(Math.random() * (maxX - minX + 1) + minX);
 
-//	public void snakeGrow() {
-//		Point tail = snake.get(snake.size() - 1);
-//		int x = tail.getX();
-//		int y = tail.getY();
-//		//若蛇向上則down=false，新增蛇的尾巴座標(x,y+1)
-//		//TODO
-////		if() {
-////			
-////		}
-//		//snake.add(new Point(x, y));
-//	}
+			// Generate random int value from 1 to N-2
+			int randomY = (int) Math.floor(Math.random() * (maxY - minY + 1) + minY);
+			i = grid[randomY][randomX];
+			grid[randomY][randomX] = 2;
+			break;
+		} while (i != 1 && i != 2);
+	}
+
+	public void snakeGrow() {
+		Point tail = snake.get(snake.size() - 1);
+		int x = tail.getX();
+		int y = tail.getY();
+		// 若蛇向上則down=false，新增蛇的尾巴座標(x,y+1)
+		if (dir.isUp()) {
+			snake.add(new Point(x, y + 1));
+		}
+
+		if (dir.isDown()) {
+			snake.add(new Point(x, y - 1));
+		}
+
+		if (dir.isLeft()) {
+			snake.add(new Point(x - 1, y));
+		}
+
+		if (dir.isRight()) {
+			snake.add(new Point(x + 1, y));
+		}
+	}
 
 	public void checkCollision(int gridvalue) throws CollisionWallException, CollisionBodyException, EatFruitException {
 		switch (gridvalue) {
@@ -97,8 +105,10 @@ public class Map {
 			throw new CollisionBodyException("撞到身體");
 
 		case 2:
-			// TODO 吃到水果(2)，所以蛇加長
-			throw new EatFruitException("吃到果實加分");
+			// 吃到水果(2)，所以蛇加長
+			snakeGrow();
+			// {throw new EatFruitException("吃到果實加分");}
+			break;
 		}
 	}
 
@@ -180,11 +190,7 @@ public class Map {
 	}
 
 	public void printMap() {
-		// 將蛇的身體設為1
-		for (int i = 0; i < snake.size(); i++) {
-			Point p = snake.get(i);
-			grid[p.getY()][p.getX()] = 1;
-		}
+		addSnakeToMap();
 		// 印出地圖
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < M; j++) {
